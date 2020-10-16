@@ -58,4 +58,14 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function boards()
+    {
+        return $this->belongsToMany(Board::class, 'board_users', 'user_id', 'id');
+    }
+
+    public function my_boards()
+    {
+        return $this->hasMany(Board::class);
+    }
 }
