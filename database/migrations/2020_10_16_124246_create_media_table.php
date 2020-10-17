@@ -14,9 +14,6 @@ class CreateMediaTable extends Migration
     public function up()
     {
         Schema::create('media', function (Blueprint $table) {
-            $table->id();
-            $table->string('title')->nullable();
-            $table->timestamps();
         });
     }
 

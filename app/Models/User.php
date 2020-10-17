@@ -61,7 +61,7 @@ class User extends Authenticatable
 
     public function boards()
     {
-        return $this->belongsToMany(Board::class, 'board_users', 'user_id', 'id');
+        return $this->belongsToMany(Board::class, null, 'user_id', 'id');
     }
 
     public function my_boards()

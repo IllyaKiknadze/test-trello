@@ -9,6 +9,8 @@ class Board extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['title', 'user_id'];
+
     public function owner()
     {
         return $this->belongsTo(User::class);
@@ -16,6 +18,6 @@ class Board extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'board_users', 'board_id', 'id');
+        return $this->belongsToMany(User::class, null, 'board_id', 'id');
     }
 }
