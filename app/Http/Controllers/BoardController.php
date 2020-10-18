@@ -9,18 +9,37 @@ use App\Models\Board;
 use App\Traits\BoardTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class BoardController extends Controller
 {
     use BoardTrait;
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/api/board",
+     *     operationId="get-all-user-boards",
+     *     summary="Get all boards that belongs to authorized user.",
+     *     tags={"all_boards"},
+     *     description="Get all boards that belongs to authorized user",
+     *     @OA\Response(
+     *       response="200",
+     *       description="Successful",
+     *       @OA\JsonContent(
+     *          @OA\Property(
+     *              property="data",
+     *              type="array",
+     *                @OA\Items(ref="#/components/schemas/BoardResource")
+     *          ),
+     *       )
+     *     )
+     * )
      *
+     * Get all user boards
+     *
+     * @param Request $request
      * @return JsonResponse
      */
-    public function all(Request $request)
+    public function userBoards(Request $request)
     {
         return response()->json([
             'boards' => BoardResource::collection($this->getUserBoards($request->user()->_id))
@@ -28,6 +47,38 @@ class BoardController extends Controller
     }
 
     /**
+     * @OA\POST(
+     *     path="/api/board/create",
+     *     operationId="create-board",
+     *     summary="Create board.",
+     *     tags={"create_board"},
+     *     description="Create new board",
+     *     @OA\Parameter(
+     *          parameter = "title",
+     *          name="title",
+     *          description="Board title",
+     *          in="path"
+     *     ),
+     *     @OA\Response(
+     *       response="200",
+     *       description="Successful",
+     *       @OA\JsonContent(
+     *          @OA\Property(
+     *              property="data",
+     *              type="array",
+     *                @OA\Items(ref="#/components/schemas/BoardResource")
+     *          ),
+     *       )
+     *     ),
+     *     @OA\SecurityScheme(
+     *          securityScheme="bearer",
+     *          type="Bearer",
+     *          in="header",
+     *          name="Authorization"
+     *      )
+     * )
+     *
+     * Create new board
      *
      * @param CreateBoardRequest $request
      * @return JsonResponse
@@ -42,6 +93,32 @@ class BoardController extends Controller
     }
 
     /**
+     * @OA\GET(
+     *     path="/api/board/{board}",
+     *     operationId="return-board",
+     *     summary="Return single board.",
+     *     tags={"return_board"},
+     *     description="Return single board by id",
+     *     @OA\Parameter(
+     *          parameter = "board",
+     *          name="board",
+     *          description="Id of board",
+     *          in="path"
+     *     ),
+     *     @OA\Response(
+     *       response="200",
+     *       description="Successful",
+     *       @OA\JsonContent(
+     *          @OA\Property(
+     *              property="data",
+     *              type="array",
+     *                @OA\Items(ref="#/components/schemas/BoardResource")
+     *          ),
+     *       )
+     *     )
+     * )
+     *
+     * Returns single board by id
      *
      * @param Board $board
      * @return JsonResponse
@@ -52,7 +129,38 @@ class BoardController extends Controller
     }
 
     /**
+     * @OA\PATCH(
+     *     path="/api/board/{board}",
+     *     operationId="edit-board",
+     *     summary="Edit board.",
+     *     tags={"edit_board"},
+     *     description="Edit board.",
+     *     @OA\Parameter(
+     *          parameter = "board",
+     *          name="board",
+     *          description="Id of board",
+     *          in="path"
+     *     ),
+     *    @OA\Parameter(
+     *          parameter = "title",
+     *          name="title",
+     *          description="New board title",
+     *          in="path"
+     *     ),
+     *     @OA\Response(
+     *       response="200",
+     *       description="Successful",
+     *       @OA\JsonContent(
+     *          @OA\Property(
+     *              property="data",
+     *              type="array",
+     *                @OA\Items(ref="#/components/schemas/BoardResource")
+     *          ),
+     *       )
+     *     )
+     * )
      *
+     * Returns single board by id
      * @param Board $board
      * @param EditBoardRequest $request
      * @return JsonResponse
@@ -67,17 +175,44 @@ class BoardController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\DELETE(
+     *     path="/api/board/{board}",
+     *     operationId="delete-board",
+     *     summary="Delete board.",
+     *     tags={"delete_board"},
+     *     description="Delete board.",
+     *     @OA\Parameter(
+     *          parameter="board",
+     *          name="board",
+     *          description="Id of board",
+     *          in="path"
+     *     ),
+     *     @OA\Response(
+     *       response="200",
+     *       description="Successful",
+     *       @OA\JsonContent(
+     *          @OA\Property(
+     *              property="success",
+     *              type="boolean"
+     *          ),
+     *          @OA\Property(
+     *              property="message",
+     *              type="string"
+     *          ),
+     *       )
+     *     )
+     * )
      *
      * @param Board $board
      * @return JsonResponse
+     * @throws \Exception
      */
     public function delete(Board $board)
     {
         if (\Gate::inspect('delete', $board)->allowed() && $board->delete()) {
-            return response()->json(['success' => true], 200);
+            return response()->json(['success' => true, 'message' => 'Board was deleted successfully'], 200);
         }
 
-        return response()->json(['message' => 'Access is forbidden'], 420);
+        return response()->json(['success' => false, 'message' => 'Access is forbidden'], 420);
     }
 }

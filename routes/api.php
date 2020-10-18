@@ -24,8 +24,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('board')->middleware('auth:sanctum')->group(function () {
-    Route::get('/', [BoardController::class, 'all']);
-    Route::get('show/{board}', [BoardController::class, 'show']);
+    Route::get('/', [BoardController::class, 'userBoards']);
+    Route::get('{board}', [BoardController::class, 'show']);
     Route::post('create', [BoardController::class, 'create']);
     Route::patch('{board}', [BoardController::class, 'edit']);
     Route::delete('{board}', [BoardController::class, 'delete']);
