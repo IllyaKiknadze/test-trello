@@ -59,11 +59,6 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-    public function boards()
-    {
-        return $this->belongsToMany(Board::class, null, 'user_id', 'id');
-    }
-
     public function my_boards()
     {
         return $this->hasMany(Board::class);

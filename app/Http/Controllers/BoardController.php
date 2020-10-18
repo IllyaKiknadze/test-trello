@@ -2,84 +2,82 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateBoardRequest;
+use App\Http\Requests\EditBoardRequest;
+use App\Http\Resources\BoardResource;
 use App\Models\Board;
+use App\Traits\BoardTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class BoardController extends Controller
 {
+    use BoardTrait;
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function index()
+    public function all(Request $request)
     {
-        //
+        return response()->json([
+            'boards' => BoardResource::collection($this->getUserBoards($request->user()->_id))
+        ], 200);
     }
 
     /**
-     * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param CreateBoardRequest $request
+     * @return JsonResponse
      */
-    public function create()
+    public function create(CreateBoardRequest $request)
     {
-        //
+        if ($board = $this->createBoard($request->input('title'), $request->user()->_id)) {
+            return response()->json(['board' => BoardResource::make($board)], 200);
+        }
+
+        return response()->json(['message' => 'Can\'t create board'], 400);
     }
 
     /**
-     * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Board  $board
-     * @return \Illuminate\Http\Response
+     * @param Board $board
+     * @return JsonResponse
      */
     public function show(Board $board)
     {
-        //
+        return response()->json(['board' => BoardResource::make($board)], 200);
     }
 
     /**
-     * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Board  $board
-     * @return \Illuminate\Http\Response
+     * @param Board $board
+     * @param EditBoardRequest $request
+     * @return JsonResponse
      */
-    public function edit(Board $board)
+    public function edit(Board $board, EditBoardRequest $request)
     {
-        //
-    }
+        if (\Gate::inspect('delete', $board)->allowed() && $board->update($request->all())) {
+            return response()->json([BoardResource::make($board)], 200);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Board  $board
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Board $board)
-    {
-        //
+        return response()->json(['message' => 'Access is forbidden'], 420);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Board  $board
-     * @return \Illuminate\Http\Response
+     * @param Board $board
+     * @return JsonResponse
      */
-    public function destroy(Board $board)
+    public function delete(Board $board)
     {
-        //
+        if (\Gate::inspect('delete', $board)->allowed() && $board->delete()) {
+            return response()->json(['success' => true], 200);
+        }
+
+        return response()->json(['message' => 'Access is forbidden'], 420);
     }
 }

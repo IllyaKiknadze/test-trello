@@ -13,11 +13,11 @@ class Board extends Model
 
     public function owner()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id','_id');
     }
 
     public function users()
     {
-        return $this->belongsToMany(User::class, null, 'board_id', 'id');
+        return $this->belongsToMany(User::class, null, 'user_id', '_id');
     }
 }

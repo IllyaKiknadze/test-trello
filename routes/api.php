@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Auth\ApiLoginController;
+use App\Http\Controllers\BoardController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +17,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('login', [ApiLoginController::class, 'login']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::prefix('board')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [BoardController::class, 'all']);
+    Route::get('show/{board}', [BoardController::class, 'show']);
+    Route::post('create', [BoardController::class, 'create']);
+    Route::patch('{board}', [BoardController::class, 'edit']);
+    Route::delete('{board}', [BoardController::class, 'delete']);
+
+});
+Route::prefix('task')->group(function () {
+    Route::get('/', [TaskController::class, 'index']);
 });
