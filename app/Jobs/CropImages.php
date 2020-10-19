@@ -11,9 +11,9 @@ use Illuminate\Queue\SerializesModels;
 use Intervention\Image\Facades\Image;
 use Storage;
 
-class CropImages
+class CropImages implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected array $images;
     private string $taskId;
@@ -61,7 +61,7 @@ class CropImages
         }
 
         \DB::collection('tasks')
-            ->where('_id',$this->taskId)
+            ->where('_id', $this->taskId)
             ->push('images', $images);
     }
 }
