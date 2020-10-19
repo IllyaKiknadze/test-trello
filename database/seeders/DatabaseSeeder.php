@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Board;
+use App\Models\Labels;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -19,5 +20,6 @@ class DatabaseSeeder extends Seeder
         Board::factory(5)->create();
 
         $this->call(ImageTypesSeeder::class);
+        $this->call(TaskStatusesSeeder::class);
     }
 }

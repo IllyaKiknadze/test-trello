@@ -9,6 +9,8 @@ class Labels extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function board()
     {
         return $this->belongsTo(Board::class);

@@ -2,84 +2,84 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateTaskRequest;
+use App\Http\Requests\EditTaskRequest;
+use App\Http\Requests\SetLabelsRequest;
+use App\Http\Resources\TaskResource;
 use App\Models\Task;
-use Illuminate\Http\Request;
+use App\Traits\TaskTrait;
+use Illuminate\Http\JsonResponse;
 
 class TaskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    use TaskTrait;
+
+    public function setLabels(SetLabelsRequest $request)
     {
-        //
+        if ($task = $this->setTaskLabels($request->_id, $request->labels)) {
+            return response()->json(['task' => TaskResource::make($task)], 200);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Can set labels. Server error!'], 400);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param CreateTaskRequest $request
+     * @return JsonResponse
      */
-    public function create()
+    public function create(CreateTaskRequest $request)
     {
-        //
-    }
+        if ($task = $this->createTask($request->title, $request->board_id, $request->user_id,
+            $request->description, $request->status_id)) {
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+            return response()->json(['task' => TaskResource::make($task)], 200);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Can not create task. Server error!'], 400);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Task  $task
-     * @return \Illuminate\Http\Response
+     * @param Task $task
+     * @return JsonResponse
      */
-    public function show(Task $task)
+    public function getSingleTask(Task $task)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Task  $task
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Task $task)
-    {
-        //
+        return response()->json(['task' => TaskResource::make($task)], 200);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Task  $task
-     * @return \Illuminate\Http\Response
+     * @param EditTaskRequest $request
+     * @param Task $task
+     * @return JsonResponse
      */
-    public function update(Request $request, Task $task)
+    public function update(EditTaskRequest $request, Task $task)
     {
-        //
+        if ($task->update($request->only(['title', 'board_id', 'user_id', 'status_id', 'description']))) {
+            return response()->json(['task' => TaskResource::make($task)], 200);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Can not create task. Server error!'], 400);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Task  $task
-     * @return \Illuminate\Http\Response
+     * @param Task $task
+     * @return JsonResponse
+     * @throws \Exception
      */
-    public function destroy(Task $task)
+    public function delete(Task $task)
     {
-        //
+        if ($task->delete()) {
+            return response()->json(['success' => true, 'message' => 'task was deleted successfully'], 200);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Can not delete task. Server error!'], 400);
     }
 }
