@@ -7,6 +7,7 @@ use App\Http\Requests\EditTaskRequest;
 use App\Http\Requests\SetLabelsRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
+use App\Services\LogService;
 use App\Traits\TaskTrait;
 use Illuminate\Http\JsonResponse;
 
