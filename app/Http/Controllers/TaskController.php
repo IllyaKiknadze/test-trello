@@ -6,8 +6,8 @@ use App\Http\Requests\CreateTaskRequest;
 use App\Http\Requests\EditTaskRequest;
 use App\Http\Requests\SetLabelsRequest;
 use App\Http\Resources\TaskResource;
+use App\Jobs\CropImages;
 use App\Models\Task;
-use App\Services\LogService;
 use App\Traits\TaskTrait;
 use Illuminate\Http\JsonResponse;
 
@@ -35,7 +35,11 @@ class TaskController extends Controller
         if ($task = $this->createTask($request->title, $request->board_id, $request->user_id,
             $request->description, $request->status_id)) {
 
-            return response()->json(['task' => TaskResource::make($task)], 200);
+            if ($request->has('images')) {
+                CropImages::dispatch($request->images, $task->id);
+            }
+
+            return response()->json(['task' => TaskResource::make(Task::find($task->id))], 200);
         }
 
         return response()->json(['success' => false, 'message' => 'Can not create task. Server error!'], 400);
@@ -62,6 +66,9 @@ class TaskController extends Controller
     public function update(EditTaskRequest $request, Task $task)
     {
         if ($task->update($request->only(['title', 'board_id', 'user_id', 'status_id', 'description']))) {
+            if ($request->has('images')) {
+                CropImages::dispatch($request->images, $task->id);
+            }
             return response()->json(['task' => TaskResource::make($task)], 200);
         }
 

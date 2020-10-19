@@ -29,19 +29,14 @@ class CreateTaskRequest extends FormRequest
             'status_id'   => 'required|exists:task_statuses,_id',
             'user_id'     => 'string|nullable|exists:users,_id',
             'description' => 'string|nullable',
-//            'labels.*.id' => 'string|nullable|exists:labels,_id'
+            'images.*'    => 'image|max:10240'
         ];
     }
 
-    /**
-     * Get the error messages for the defined validation rules.
-     *
-     * @return array
-     */
     public function messages()
     {
         return [
-            'labels.*.id.exists' => 'The selected label id is invalid.',
+            'images.*.max' => "Maximum file size to upload is 10MB (10240 KB). If you are uploading a photo, try to reduce its resolution to make it under 10MB"
         ];
     }
 }
