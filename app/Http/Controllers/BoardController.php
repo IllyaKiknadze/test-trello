@@ -167,7 +167,7 @@ class BoardController extends Controller
      */
     public function edit(Board $board, EditBoardRequest $request)
     {
-        if (\Gate::inspect('delete', $board)->allowed() && $board->update($request->all())) {
+        if (\Gate::inspect('update', $board)->allowed() && $board->update($request->all())) {
             return response()->json([BoardResource::make($board)], 200);
         }
 
